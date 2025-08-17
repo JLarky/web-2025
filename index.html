@@ -4,6 +4,27 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>My website</title>
+    <script>
+      (function attachShadowRoots(root) {
+        function supportsDeclarativeShadowDOM() {
+          return HTMLTemplateElement.prototype.hasOwnProperty("shadowRootMode");
+        }
+        if (supportsDeclarativeShadowDOM()) {
+          // Declarative Shadow DOM is supported, no need to polyfill.
+          return;
+        }
+        root
+          .querySelectorAll("template[shadowrootmode]")
+          .forEach((template) => {
+            const mode = template.getAttribute("shadowrootmode");
+            const shadowRoot = template.parentNode.attachShadow({ mode });
+
+            shadowRoot.appendChild(template.content);
+            template.remove();
+            attachShadowRoots(shadowRoot);
+          });
+      })(document);
+    </script>
   </head>
   <body>
     <h1>This is my website</h1>
@@ -28,7 +49,9 @@
         {
           "imports": {
             "@lift-html/core": "https://esm.sh/@lift-html/core",
-            "uhtml": "https://esm.sh/uhtml@5.0.9"
+            "solid-js": "https://esm.sh/solid-js",
+            "solid-js/web": "https://esm.sh/solid-js/web",
+            "solid-js/html": "https://esm.sh/solid-js/html"
           }
         }
       </script>
@@ -36,24 +59,32 @@
       <script type="module" src="./script.js"></script>
 
       <div>
-        yihui
         <my-copy-to-clipboard show-by-default="true">
           <template shadowrootmode="open">
             <style>
+              :host {
+                position: relative;
+              }
               .copy-button {
                 cursor: pointer;
                 border: 1px solid;
                 width: 1em;
                 height: 1em;
-                /* display: none; */
+                display: none;
+                display: inline-block;
                 position: absolute;
                 inset: 5px 5px auto auto;
                 box-shadow: -3px 3px #999;
               }
 
-              :is(:focus, :hover) > .copy-button {
+              /*
+              :host(:hover) .copy-button,
+              :host(:focus) .copy-button,
+              .copy-button:hover,
+              .copy-button:focus {
                 display: inline-block;
               }
+              */
 
               .copy-success {
                 box-shadow: none;
@@ -65,13 +96,13 @@
                 border-style: dotted;
               }
 
-              /*# sourceMappingURL=copy-button.min.css.map */
+              /*# sourceURL=inline:copy-button.css */
             </style>
-            <pre><code>hello world</code><copy-button-outlet></copy-button-outlet></pre>
+            <slot></slot>
           </template>
+          <pre><code>hello world</code></pre>
         </my-copy-to-clipboard>
       </div>
-      <div id="counter"></div>
     </main>
   </body>
 </html>

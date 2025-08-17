@@ -1,45 +1,35 @@
 import { liftHtml } from "@lift-html/core";
-import { html, render, signal, effect } from "uhtml";
+import { createSignal } from "solid-js";
+import { render } from "solid-js/web";
+import html from "solid-js/html";
 
 liftHtml("my-copy-to-clipboard", {
-  init() {
-    const el = this.shadowRoot.querySelector("code");
-    const outlet = this.shadowRoot.querySelector("copy-button-outlet");
-    console.log(el);
-    const btn = document.createElement("span"),
-      buttonClasses = btn.classList,
-      preEl = el.parentNode;
-    function addClass(e) {
-      buttonClasses.add(e), setTimeout(() => buttonClasses.remove(e), 1000);
-    }
-    btn.className = "copy-button";
-    btn.onclick = () =>
-      navigator.clipboard.writeText(el.innerText).then(
-        () => addClass("copy-success"),
-        () => addClass("copy-fail")
-      );
-    // preEl.append(btn);
+  init(dispose) {
+    const el = this.querySelector("code");
+    const preEl = el.parentNode;
     preEl.tabIndex = "0";
     preEl.style.position = "relative";
     const App = () => {
-      const buttonClass = signal("init");
-      effect(() => {
-        console.log("xxxx", buttonClass.value);
-      });
+      const [buttonClass, setButtonClass] = createSignal("init");
       return html`<button
-        class=${buttonClass.value}
+        class=${() => "copy-button " + buttonClass()}
         onClick=${() => {
-          buttonClass.value = "testing";
           Promise.try(() => navigator.clipboard.writeText(el.innerText)).then(
-            () => (buttonClass.value = "copy-success"),
-            () => (buttonClass.value = "copy-fail")
+            () => setButtonClass("copy-success"),
+            () => setButtonClass("copy-fail")
           );
         }}
-      >
-        ${buttonClass.value}
-      </button>`;
+      ></button>`;
     };
-    render(outlet, App);
+    const supportsDeclarative =
+      HTMLElement.prototype.hasOwnProperty("attachInternals");
+    const internals = supportsDeclarative ? this.attachInternals() : undefined;
+    let shadow =
+      internals?.shadowRoot ||
+      this.attachShadow({
+        mode: "open",
+      });
+    dispose(render(App, shadow));
   },
 });
 
@@ -60,12 +50,3 @@ liftHtml("my-copy-to-clipboard-2", {
 
 const el = document.createElement("my-copy-to-clipboard");
 el.setAttribute("show-by-default", "true");
-
-function Counter() {
-  const count = signal(0);
-
-  return html`
-    <button onClick=${() => count.value++}>Clicked ${count.value} times</button>
-  `;
-}
-render(document.getElementById("counter"), Counter);
