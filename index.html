@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>My website</title>
+  </head>
+  <body>
+    <h1>This is my website</h1>
+
+    <main>
+      <!-- my name is
+      <span
+        style="border: 1px solid red; border-radius: 10px; padding-inline: 5px"
+        >Yaroslav Lapin</span
+      >
+      <my-copy-to-clipboard
+        text="Yaroslav Lapin"
+        button-text="Copy the name to clipboard"
+      >
+
+        <button>Copy the name to clipboard</button>
+      </my-copy-to-clipboard> -->
+
+      <div class="copy-button">hello</div>
+
+      <script type="importmap">
+        {
+          "imports": {
+            "@lift-html/core": "https://esm.sh/@lift-html/core",
+            "uhtml": "https://esm.sh/uhtml@5.0.9"
+          }
+        }
+      </script>
+
+      <script type="module" src="./script.js"></script>
+
+      <div>
+        yihui
+        <my-copy-to-clipboard show-by-default="true">
+          <template shadowrootmode="open">
+            <style>
+              .copy-button {
+                cursor: pointer;
+                border: 1px solid;
+                width: 1em;
+                height: 1em;
+                /* display: none; */
+                position: absolute;
+                inset: 5px 5px auto auto;
+                box-shadow: -3px 3px #999;
+              }
+
+              :is(:focus, :hover) > .copy-button {
+                display: inline-block;
+              }
+
+              .copy-success {
+                box-shadow: none;
+                background: #999;
+                transition: box-shadow 0.3s ease-out, background 0.3s ease-out;
+              }
+
+              .copy-fail {
+                border-style: dotted;
+              }
+
+              /*# sourceMappingURL=copy-button.min.css.map */
+            </style>
+            <pre><code>hello world</code><copy-button-outlet></copy-button-outlet></pre>
+          </template>
+        </my-copy-to-clipboard>
+      </div>
+      <div id="counter"></div>
+    </main>
+  </body>
+</html>
